@@ -1,4 +1,4 @@
-import createElement from '../../assets/lib/create-element.js';
+import createElement from '../../../../Учёба ебанная/Js/assets/lib/create-element.js';
 
 export default class Modal {
   elem = null;
@@ -11,15 +11,19 @@ export default class Modal {
     this.elem = createElement(`
       <div class="modal">
         <div class="modal__overlay"></div>
+
         <div class="modal__inner">
           <div class="modal__header">
             <button type="button" class="modal__close">
               <img src="/assets/images/icons/cross-icon.svg" alt="close-icon" />
             </button>
+
             <h3 class="modal__title"></h3>
           </div>
+
           <div class="modal__body"></div>
         </div>
+
       </div>
     `)
   }
@@ -42,10 +46,10 @@ export default class Modal {
 
   close = () => {
     document.body.classList.remove('is-modal-open');
-    // if (document.querySelector('.modal')){
-      this.elem.remove();
+    if (document.querySelector('.modal')){
+      document.querySelector('.modal').remove();
       document.removeEventListener('keydown', this.#closeEsc);
-    // }
+    }
   }
 
   #closeButton = (event) =>{   
