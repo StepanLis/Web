@@ -46,6 +46,10 @@ export default class ProductGrid {
       this.products = this.products.filter(item =>  item.category === this.filters.category);
     }
 
+    // console.log(this.products[0].nuts)
+    // this.products = this.products.filter(item => (item.nuts !== this.filters.noNuts || 'nuts' in item === false) &&
+    //                                              ('vegeterian' in item === false || (item.vegeterian === this.filters.vegeterianOnly && 'vegeterian' in item))
+    //                                              );
 
     for (let card of this.products){
       let productCard = new ProductCard(card);
@@ -57,30 +61,7 @@ export default class ProductGrid {
     
     this.products = this.allProducts;
     
-    if (filters.noNuts){
-      this.filters.noNuts = filters.noNuts;
-    }else if (filters.noNuts === false){
-      this.filters.noNuts = false;
-    } 
-    
-    if (filters.vegeterianOnly){
-      this.filters.vegeterianOnly = filters.vegeterianOnly;
-    }else if (filters.vegeterianOnly === false){
-      this.filters.vegeterianOnly = false;
-    } 
-    
-    if (filters.maxSpiciness){
-      this.filters.maxSpiciness = filters.maxSpiciness;
-    } else if (filters.maxSpiciness === 4){
-      this.filters.maxSpiciness = 4;
-    }
-
-    if (filters.category){
-      this.filters.category = filters.category;
-    }else if (filters.category === ""){
-      this.filters.category = "";
-    }
-
+    Object.assign(this.filters, filters);
 
     this.#renderWithFilter();
     
