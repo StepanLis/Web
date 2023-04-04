@@ -5,6 +5,7 @@ export default class StepSlider {
   #steps = 0;
   #value = 0;
   #thumb = null;
+  #valueElement = 0;
   constructor({ steps, value = 0 }) {
     this.#steps = steps;
     this.#value = value;
@@ -14,13 +15,17 @@ export default class StepSlider {
     this.#thumb = this.elem.querySelector(".slider__thumb");
     this.#thumb.ondragstart = () => false;
 
-    this.#thumb.addEventListener('pointerdown', this.#pointermove)
+    this.#thumb.addEventListener('pointerdown', this.#pointerDown);
     this.elem.addEventListener('click', this.#clickSlider);
-
+    document.addEventListener('pointerup', this.#pointerUp)
   }
 
-  #pointermove = (event) =>{
+  #pointerDown = () =>{
     this.elem.classList.add("slider_dragging");
+    document.addEventListener('pointermove', this.#pointerMove)
+  }
+
+  #pointerMove = (event) =>{
     let left = event.clientX - this.elem.getBoundingClientRect().left;
     let leftRelative = left / this.elem.offsetWidth;
 
@@ -42,7 +47,48 @@ export default class StepSlider {
     let approximateValue = leftRelative * segments;
     let value = Math.round(approximateValue);
 
+    if (value != this.elem.querySelector('.slider__value').textContent){
+      this.elem.querySelector('.slider__value').innerHTML = value;
+      this.elem.querySelector(".slider__step-active").classList.remove("slider__step-active")
+      let spanArr = this.elem.querySelector('.slider__steps').querySelectorAll('span');
+      spanArr[value].classList.add("slider__step-active");  
+    }
     
+  }
+
+  #pointerUp = (event) =>{
+    // alert(this.elem.querySelector('.slider__value').textContent);
+    this.elem.classList.remove("slider_dragging");
+    document.removeEventListener('pointermove', this.#pointerMove)
+    
+    let spanArr = this.elem.querySelector('.slider__steps').querySelectorAll('span');
+    let left = event.clientX - this.elem.getBoundingClientRect().left;
+    let leftRelative = left / this.elem.offsetWidth;
+
+    if (leftRelative < 0) {
+      leftRelative = 0;
+    }
+
+    if (leftRelative > 1) {
+      leftRelative = 1;
+    }
+
+    let segments = this.#steps - 1;
+    let approximateValue = leftRelative * segments;
+    let value = Math.round(approximateValue);
+    let valuePercents = value / segments * 100;
+    
+    this.elem.querySelector('.slider__value').innerHTML = value;
+
+    this.elem.querySelector(".slider__step-active").classList.remove("slider__step-active")
+    spanArr[value].classList.add("slider__step-active");
+
+    let thumb = this.elem.querySelector('.slider__thumb');
+    let progress = this.elem.querySelector('.slider__progress');
+
+    thumb.style.left = `${valuePercents}%`;
+    progress.style.width = `${valuePercents}%`;
+
 
     this.elem.dispatchEvent(
       new CustomEvent('slider-change', { 
@@ -50,7 +96,6 @@ export default class StepSlider {
       bubbles: true 
     })
     );
-    // alert(value);
   }
 
   #render = () =>{
@@ -59,11 +104,8 @@ export default class StepSlider {
       <div class="slider__thumb" style="left: 0%;">
         <span class="slider__value">${this.#value}</span>
       </div>
-
       <div class="slider__progress" style="width: 0%;"></div>
-
       <div class="slider__steps">
-
       </div>
     </div>
     `)
