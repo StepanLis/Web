@@ -7,43 +7,39 @@ export default class Cart {
 
   addProduct(product) {
     if (product){
-      if (this.cartItems.includes(product)){
-        this.cartItems.find(item => item.id === product.id).count++
+      let cartItem = this.cartItems.find(item => item.product === product);
+      if (cartItem){
+        cartItem.count++
       }else{
-        product.count = 1;
-        this.cartItems.push(product);
+        cartItem = {};
+        cartItem.product = product;
+        cartItem.count = 1;
+        this.cartItems.push(cartItem);
       }
       console.log(this.cartItems);
-      this.onProductUpdate(this.cartItems.find(item => item.id ===product.id));
+      this.onProductUpdate(this.cartItems);
     }else{
-      console.log("ПУсто!")
+      console.log("Передан пустой объект!")
     }
   }
 
   updateProductCount(productId, amount) {
-    let cartItem = this.cartItems.find(item => item.id === productId);
+    let cartItem = this.cartItems.find(item => item.product.id === productId);
     if (cartItem){
-      if (cartItem.count){
-        cartItem.count += amount;
-        this.onProductUpdate(this.cartItems.find(item => item.id === productId));
-        if (!cartItem.count){
-          this.cartItems.splice([(this.cartItems.indexOf(cartItem))], 1);
-          if (this.isEmpty()){
-            // document.querySelector(".cart-icon__inner").remove();
-            document.querySelector(".cart-icon").classList.remove("cart-icon_visible");
-          }
-        }
-      }else{
-        console.log("Закончилось");
+      // if (cartItem.count){
+      cartItem.count += amount;
+      if (!cartItem.count){
+        this.cartItems.splice([(this.cartItems.indexOf(cartItem))], 1);
+        this.isEmpty();
       }
-      
-      
+      this.onProductUpdate(cartItem);
+      // }else{
+        // console.log("Закончилось");
+      // }
       console.log(this.cartItems);
     }else{
-      console.log("Нету");
+      console.log("Нет объекта");
     }
-    
-    
   }
 
   isEmpty() {
@@ -59,7 +55,7 @@ export default class Cart {
 
   getTotalPrice() {
     let totalPrice = 0;
-    this.cartItems.forEach(item => totalPrice += item.price * item.count);
+    this.cartItems.forEach(item => totalPrice += item.product.price * item.count);
     return (totalPrice);
   }
 
